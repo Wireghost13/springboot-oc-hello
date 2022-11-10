@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "oc_config.secret1",
+    "type": "java.lang.String",
+    "description": "A description for 'oc_config.secret1'"
+  },
+  {
+    "name": "oc_config.secret2",
+    "type": "java.lang.String",
+    "description": "A description for 'oc_config.secret2'"
+  }
+]}

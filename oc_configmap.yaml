@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: spring-oc1
+  namespace: springboot-oc-demo
+data:
+ dev-config.json:
+   '{
+     "env_app_name": "oc_spring_app",
+     "env_port": "8083",
+     "env_secret1": "oc_secret_1",
+     "env_secret2": "oc_secret_2"
+    }'

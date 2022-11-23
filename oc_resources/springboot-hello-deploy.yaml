@@ -1,0 +1,180 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+
+---
+
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+spec:
+  runPolicy: Serial
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'java:openjdk-11-ubi8'
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/Wireghost13/springboot-oc-hello.git'
+    contextDir: /
+  triggers:
+    - type: Generic
+      generic:
+        secretReference:
+          name: springboot-oc-hello-git-generic-webhook-secret
+    - type: GitHub
+      github:
+        secretReference:
+          name: springboot-oc-hello-git-github-webhook-secret
+    - type: ImageChange
+      imageChange: {}
+    - type: ConfigChange
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'springboot-oc-hello-git:latest'
+
+---
+
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - springboot-oc-hello-git
+        from:
+          kind: ImageStreamTag
+          namespace: oc-spring-hello
+          name: 'springboot-oc-hello-git:latest'
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: springboot-oc-hello-git
+    deploymentconfig: springboot-oc-hello-git
+  template:
+    metadata:
+      labels:
+        app: springboot-oc-hello-git
+        deploymentconfig: springboot-oc-hello-git
+    spec:
+      containers:
+        - name: springboot-oc-hello-git
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/oc-spring-hello/springboot-oc-hello-git@sha256:e25a8fd00c96552c47ed0ad0f2a8414643bc0dcaa3c32e183cce14e0501db5fa
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+spec:
+  clusterIP: 10.217.4.46
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - 10.217.4.46
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: springboot-oc-hello-git
+    deploymentconfig: springboot-oc-hello-git
+
+---
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  host: springboot-oc-hello-git-oc-spring-hello.apps-crc.testing
+  to:
+    kind: Service
+    name: springboot-oc-hello-git
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

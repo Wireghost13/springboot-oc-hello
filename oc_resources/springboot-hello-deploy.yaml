@@ -1,5 +1,5 @@
-apiVersion: image.openshift.io/v1
 kind: ImageStream
+apiVersion: image.openshift.io/v1
 metadata:
   name: springboot-oc-hello-git
   namespace: oc-spring-hello
@@ -102,7 +102,7 @@ spec:
       containers:
         - name: springboot-oc-hello-git
           image: >-
-            image-registry.openshift-image-registry.svc:5000/oc-spring-hello/springboot-oc-hello-git@sha256:e25a8fd00c96552c47ed0ad0f2a8414643bc0dcaa3c32e183cce14e0501db5fa
+            image-registry.openshift-image-registry.svc:5000/oc-spring-hello/springboot-oc-hello-git
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -114,6 +114,7 @@ spec:
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
+      schedulerName: default-scheduler
 
 ---
 

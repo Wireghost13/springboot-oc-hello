@@ -1,0 +1,31 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+spec:
+  clusterIP: 10.217.4.46
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - 10.217.4.46
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: springboot-oc-hello-git
+    deploymentconfig: springboot-oc-hello-git

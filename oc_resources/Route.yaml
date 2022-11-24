@@ -1,0 +1,27 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  host: springboot-oc-hello-git-oc-spring-hello.apps-crc.testing
+  to:
+    kind: Service
+    name: springboot-oc-hello-git
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

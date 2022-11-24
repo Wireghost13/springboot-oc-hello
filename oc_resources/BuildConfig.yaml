@@ -1,0 +1,44 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: springboot-oc-hello-git
+  namespace: oc-spring-hello
+  labels:
+    app: springboot-oc-hello-git
+    app.kubernetes.io/component: springboot-oc-hello-git
+    app.kubernetes.io/instance: springboot-oc-hello-git
+    app.kubernetes.io/name: springboot-oc-hello-git
+    app.kubernetes.io/part-of: springboot-oc-hello-git-app
+    app.openshift.io/runtime: java
+    app.openshift.io/runtime-version: openjdk-11-ubi8
+spec:
+  runPolicy: Serial
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'java:openjdk-11-ubi8'
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/Wireghost13/springboot-oc-hello.git'
+    contextDir: /
+  triggers:
+    - type: Generic
+      generic:
+        secretReference:
+          name: springboot-oc-hello-git-generic-webhook-secret
+    - type: GitHub
+      github:
+        secretReference:
+          name: springboot-oc-hello-git-github-webhook-secret
+    - type: ImageChange
+      imageChange: {}
+    - type: ConfigChange
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'springboot-oc-hello-git:latest'
+
